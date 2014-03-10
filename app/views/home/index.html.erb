@@ -21,10 +21,15 @@ filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endCo
 $(document).ready(function(){
 $("#btnchart").click(function(){
 	var user_searchterm = document.getElementById("user_searchterm").value;
-	$.get("home/"+user_searchterm,function(data,status){
+	$.ajax({
+	url: "home/"+user_searchterm,
+	dataType: 'html',
+	success: function(data,status){
     //alert("Data: " + data + "\nStatus: " + status);
     console.log("status of twitter server"+ status);
     $("#results").html(data);
+  }
+  
   });
 	
 		
