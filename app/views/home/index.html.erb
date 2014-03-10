@@ -3,34 +3,56 @@
 body
 {
 background-image: url('bg.jpg');
+background-size: 100%;
 }
+
 .container
 {
-
+width: 70%;
+padding: 50 50 50 50;
 background-color: rgba(0, 0, 0, 0.4);
-    /* For IE 5.5 - 7*/
-    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000);
-    /* For IE 8*/
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
+/* For IE 5.5 - 7*/
+filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000);
+/* For IE 8*/
+-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";
 }
 </style>
+<script type="text/javascript">
+$(document).ready(function(){
+$("#btnchart").click(function(){
+	var user_searchterm = document.getElementById("user_searchterm").value;
+	$.get("home/"+user_searchterm,function(data,status){
+    //alert("Data: " + data + "\nStatus: " + status);
+    console.log("status of twitter server"+ status);
+    $("#results").html(data);
+  });
+	
+		
+});
+});
+</script>
 </head>
 <body>
+</br>
+	</br>
         <div class="container" style="color: white">
-<div class="span12">
-<div class="row-fluid">
-  <div class="span4"></div>
-  <div class="span4 offset2">
-</br></br>
-<h1>Switter Search</h1>
-</br>
-</br>
-</br>
-<input type="text" text="enter the search term">
-</div>
-</div>	
-</div>
-	
-        </div>
+			<div class="span12">
+     			<div class="row-fluid">
+	    		  <div class="span4"></div>
+		        	  </br></br>
+			          <h1>Switter Search</h1>
+			          </br></br></br>
+			       <div>
+			     <input id="user_searchterm" type="text" placeholder="enter a product or a place or a thing" text="hi">&nbsp;&nbsp;   
+			     <button class="btn btn-primary" type="button" id="btnchart">generate charts</button>
+			     </br>
+			     </div>
+			      <div id=results> </div>
+               </div>
+                	
+           </div>
+           
+	    </div>
+
 </body>
 

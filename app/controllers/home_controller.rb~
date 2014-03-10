@@ -21,17 +21,20 @@ class HomeController < ApplicationController
         
         
 
-        puts client.search("#ruby -rt", :lang => "ja").first.text
+    #puts client.search("#ruby -rt", :lang => "en").first.text
 
   end
 
-  def hi
+  def result_tweet
 
-   require "rubygems"
-   require "twitter"
    
-   puts "hi"
-
-   puts Twitter.user("akrish2011").location
+   @text = params[:user_searchterm]  
+   puts "hi*************************************"
+   @testtext = @text
+   @testtext
+   #render inline: "<%= @testtext %>"
+   render layout: "result_tweet"
+      
   end
+
 end
