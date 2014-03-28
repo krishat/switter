@@ -1,2 +1,9 @@
+
+<!-- this page renders the tweets from the twitter server via machine -->
 <h1>RESULTS</h1>
-<%= @text.html_safe %>
+<%= @text.each do |tweet| %>
+<div class="alert">
+<%= tweet.text %>
+</br>
+</div>
+<% end %>
