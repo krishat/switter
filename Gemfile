@@ -13,6 +13,8 @@ gem 'stanford-core-nlp'
 
 gem 'open-nlp'
 
+gem 'rubytree'
+
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3'
 

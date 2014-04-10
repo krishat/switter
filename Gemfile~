@@ -11,7 +11,7 @@ gem 'treat'
 
 gem 'stanford-core-nlp'
 
-gem 'open-nlp stanford-core-nlp'
+gem 'open-nlp'
 
 # Use sqlite3 as the database for Active Record
 gem 'sqlite3'
