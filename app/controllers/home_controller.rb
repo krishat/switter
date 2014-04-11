@@ -43,7 +43,7 @@ class HomeController < ApplicationController
        puts "searchterm:"+searchterm
        puts "*************************************"
        #twitter stream ,:result_type => "recent"
-       @tweetinput = client.search(searchterm,:lang => "en",:result_type => "mixed").take(15)
+       @tweetinput = client.search(searchterm,:lang => "en",:result_type => "mixed").take(2)
              
        #Algorithm for performing sentimental analysis on tweets
        @tweetinput.each do |eachtweet|
@@ -93,7 +93,7 @@ class HomeController < ApplicationController
             text.get(:sentences).each do |sentence|
                
                #create a tree
-               startvertex = {searchterm => {}}
+               startvertex = "{#{searchterm} => {}}"
                # create two child nodes 
                @graph = [startvertex] 
                @sentiment_array = Array.new()
@@ -126,6 +126,9 @@ class HomeController < ApplicationController
                          #puts "working"
                          if (pos == "JJ"||pos == "JJR"||pos == "JJS") then
                            #check whether positive or not
+                           newadjvertex = "{#{tokenstring} => {#{searchterm} => [#{pos},1]}}"
+                           @graph << newadjvertex
+                           puts newadjvertex
                            if positivewords.include? tokenstring then
                               @positivecount += 1
                               @graph << "positive"
@@ -140,9 +143,14 @@ class HomeController < ApplicationController
                                 @graph << "negative"
                                 @negativecount += 1
                                 @sentiment_array.push("negative")
-                           end             
+                           end 
+                           #adding the adjective node
+                              @graph.each do |vertex|
+                                    vertex.sub(":adjective",tokenstring)
+                              end #graph end           
+                         
                          else
-                           newvertex = {tokenstring => {:adjective => [pos,0]}}
+                           newvertex = "{#{tokenstring} => {:adjective => [#{pos},0]}}"
                            @graph << newvertex
                            #puts newvertex 
                          end#to check whether adjective or not
@@ -151,7 +159,7 @@ class HomeController < ApplicationController
               end
               
            end
-         puts @sentiment_array
+         #puts @sentiment_array
          puts @graph
          #puts "##################"
        end
