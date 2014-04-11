@@ -23,7 +23,9 @@ class HomeController < ApplicationController
        negativewords = File.read("app/assets/images/poswrds.txt")
        #stanford nlp pipeline
        pipeline =  StanfordCoreNLP.load(:tokenize, :ssplit, :pos, :lemma, :parse, :ner, :dcoref)   
-       
+       @positivecount = 0
+       @negativecount = 0
+       @netural = 0
        
        #twitter api object definition client is streaming here    
        client = Twitter::REST::Client.new do |config|
@@ -41,7 +43,7 @@ class HomeController < ApplicationController
        puts "searchterm:"+searchterm
        puts "*************************************"
        #twitter stream ,:result_type => "recent"
-       @tweetinput = client.search(searchterm,:lang => "en",:result_type => "mixed").take(10)
+       @tweetinput = client.search(searchterm,:lang => "en",:result_type => "mixed").take(15)
              
        #Algorithm for performing sentimental analysis on tweets
        @tweetinput.each do |eachtweet|
@@ -73,7 +75,7 @@ class HomeController < ApplicationController
          
          if orgtweet.include? "@" then
            atindex = split_originaltweet.index(orgtweet)
-           split_originaltweet[atindex].class
+           #split_originaltweet[atindex].class
          end        
        
        end
@@ -81,28 +83,30 @@ class HomeController < ApplicationController
        #generating modified tweet
        modifiedtweet = split_originaltweet.join(' ')
        text = modifiedtweet
-       puts text
-       puts "----------------------------------------"
+       #puts text
+       #puts "----------------------------------------"
        
        #text processing 
        text = StanfordCoreNLP::Annotation.new(text)
        pipeline.annotate(text)
-    
+       
             text.get(:sentences).each do |sentence|
                
                #create a tree
                startvertex = {searchterm => {}}
                # create two child nodes 
                @graph = [startvertex] 
-               
+               @sentiment_array = Array.new()
                # Syntatical dependencies
                #puts sentence.get(:basic_dependencies).to_s
+               counter = 0
                sentence.get(:tokens).each do |token|
                       # Default annotations for all tokens
                       #puts token.get(:value).to_s
                       #puts token.get(:character_offset_begin).to_s
                       #puts token.get(:character_offset_end).to_s.to_i
                       #puts token.get(:original_text).to_s.byteslice(start_pos,end_pos) 
+                      
                       # POS returned by the tagger
                       # Lemma (base form of the token)
                       #puts token.get(:lemma).to_s
@@ -120,28 +124,41 @@ class HomeController < ApplicationController
                       if !(searchterm.include?(tokenstring)) 
                          
                          #puts "working"
-                         if (pos == "JJ"||pos == "JJR"||pos == "JJS") 
-                                #construct a new two child nodes for the adjective word found
-                          #                      puts "adj"
+                         if (pos == "JJ"||pos == "JJR"||pos == "JJS") then
+                           #check whether positive or not
+                           if positivewords.include? tokenstring then
+                              @positivecount += 1
+                              @graph << "positive"
+                              @sentiment_array.push("positive")
+                              
+                           elsif  negativewords.include? tokenstring then
+                              @negativecount = @negativecount + 1
+                              @graph << "negative"
+                              @sentiment_array.push("negative")
+                           else
+                                #puts "netural"
+                                @graph << "negative"
+                                @negativecount += 1
+                                @sentiment_array.push("negative")
+                           end             
                          else
-                           
                            newvertex = {tokenstring => {:adjective => [pos,0]}}
                            @graph << newvertex
                            #puts newvertex 
-                           
-                           end#to check whether adjective or not
+                         end#to check whether adjective or not
                       end #if not root
-                      
-                      
-                      
                       
               end
               
            end
-         
+         puts @sentiment_array
          puts @graph
          #puts "##################"
        end
+   puts @positivecount
+   puts @negativecount
+   
+       
    @text = @tweetinput
    @text
    render layout: false
