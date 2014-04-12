@@ -1,7 +1,7 @@
 <!-- this page renders the tweets from the twitter server via machine -->
-<h1>RESULTS</h1>
+<h2>Tweets For The Given Search Term</h2>
 <%= @text.each do |tweet| %>
-<div class="alert">
+<div class="alert alert-info">
 <%= tweet.text %>
 </br>
 </div>
