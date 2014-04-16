@@ -14,7 +14,14 @@ class HomeController < ApplicationController
    
   end
   
+  def chart
+    @positivescore = @@positive_global
+    @negativescore = @@negative_global
+  end
   
+  def tweets
+    @tweets_print = @@tweet_base
+  end
   
   def result_tweet
 
@@ -160,13 +167,14 @@ class HomeController < ApplicationController
               
            end
          #puts @sentiment_array
-         puts @graph
+         #puts @graph
          #puts "##################"
        end
    puts @positivecount
    puts @negativecount
-   
-       
+   @@positive_global = @positivecount
+   @@negative_global = @negativecount    
+   @@tweet_base = @text
    @text = @tweetinput
    @text
    render layout: false

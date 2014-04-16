@@ -1,0 +1,53 @@
+<script type="text/javascript">
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Tweets', 'Positive', 'Negative'],
+          ['100',  <%= @positivescore %>, <%= @negativescore %>],
+          
+        ]);
+
+        var options = {
+          title: 'General Analysis',
+          hAxis: {title: 'Total Tweets', titleTextStyle: {color: 'red'}}
+        };
+
+        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
+    </script>
+  </br>
+	
+        <div class="container" style="color: white">
+         	<div class="span20">
+     			<div class="row-fluid">
+	    		  <div class="span4"></div>
+		        	  </br></br>
+			          <h1>Sentiment Analysis On Twitter Tweets (SAOTT)</h1>
+			          </br></br>
+			          <div>
+						<input id="user_searchterm" type="text" placeholder="enter a product or a place or a thing" text="hi">&nbsp;&nbsp;   
+						<button class="btn btn-primary" type="button" id="btnchart">Start Analysis</button>
+						</br>
+					  </div>
+		         </div>
+		    </div>
+        </div>
+        </br>
+    <div class="navbar">
+  		<div class="navbar-inner">
+     		<ul class="nav">
+     			<li class="active"><a href="#">HOMEPAGE</a></li>
+      			<li><a href="#">TWEETS</a></li>
+      			<li><a href="home/charts/chart" target="_parent">CHARTS</a></li>
+      			<li><a href="#">DATAFILE</a></li>
+    		</ul>
+  		</div>
+	</div>
+	<div class="well well-large" id="welcomenote">
+	  <div id="chart_div" style="width: 900px; height: 500px;"></div>  
+	</div>
+
+      
+  
