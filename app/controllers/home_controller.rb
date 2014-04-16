@@ -17,17 +17,26 @@ class HomeController < ApplicationController
   def chart
     @positivescore = @@positive_global
     @negativescore = @@negative_global
+    @searchterm = @@search_term 
   end
   
   def tweets
-    @tweets_print = @@tweet_base
+    @tweets_print = Array.new
+    File.open("app/assets/images/tweetbase.txt", "r") do |f|
+         f.each_line do |line|
+            puts line
+            @tweets_print << line
+         end
+    end
   end
   
   def result_tweet
 
        #data read from positive and negative words file
        positivewords = File.read("app/assets/images/poswrds.txt")
-       negativewords = File.read("app/assets/images/poswrds.txt")
+       negativewords = File.read("app/assets/images/negwrds.txt")
+       tweetbase = File.open("app/assets/images/tweetbase.txt", 'a+')
+       tweetgraph = File.open("app/assets/images/tweetgraph.txt", 'a+')
        #stanford nlp pipeline
        pipeline =  StanfordCoreNLP.load(:tokenize, :ssplit, :pos, :lemma, :parse, :ner, :dcoref)   
        @positivecount = 0
@@ -43,18 +52,21 @@ class HomeController < ApplicationController
       	end     
        
        
-       searchterm = "#"+ params[:user_searchterm]  
+       searchterm = "#"+ params[:user_searchterm]
+       @@search_term = params[:user_searchterm] 
        puts "*************************************"
        puts "searching for tweets"
        puts "*************************************"
        puts "searchterm:"+searchterm
        puts "*************************************"
+       
        #twitter stream ,:result_type => "recent"
        @tweetinput = client.search(searchterm,:lang => "en",:result_type => "mixed").take(2)
              
        #Algorithm for performing sentimental analysis on tweets
        @tweetinput.each do |eachtweet|
        
+       tweetbase.write(eachtweet.full_text)
        
        #removing all http RT and user name from the original tweet --> modified tweet
        originaltweet = eachtweet.full_text
@@ -108,21 +120,6 @@ class HomeController < ApplicationController
                #puts sentence.get(:basic_dependencies).to_s
                counter = 0
                sentence.get(:tokens).each do |token|
-                      # Default annotations for all tokens
-                      #puts token.get(:value).to_s
-                      #puts token.get(:character_offset_begin).to_s
-                      #puts token.get(:character_offset_end).to_s.to_i
-                      #puts token.get(:original_text).to_s.byteslice(start_pos,end_pos) 
-                      
-                      # POS returned by the tagger
-                      # Lemma (base form of the token)
-                      #puts token.get(:lemma).to_s
-                      # Named entity tag
-                      #puts token.get(:named_entity_tag).to_s
-                      # Coreference
-                      #puts token.get(:coref_cluster_id).to_s
-                      # Also of interest: coref, coref_chain, 
-                      # coref_cluster, coref_dest, coref_graph.
                       
                       tokenstring = token.get(:value).to_s
                       pos = token.get(:part_of_speech).to_s
@@ -133,23 +130,29 @@ class HomeController < ApplicationController
                          #puts "working"
                          if (pos == "JJ"||pos == "JJR"||pos == "JJS") then
                            #check whether positive or not
-                           newadjvertex = "{#{tokenstring} => {#{searchterm} => [#{pos},1]}}"
-                           @graph << newadjvertex
-                           puts newadjvertex
+                                                                     
                            if positivewords.include? tokenstring then
                               @positivecount += 1
-                              @graph << "positive"
-                              @sentiment_array.push("positive")
-                              
+                              #@graph << "positive"
+                              #@sentiment_array.push("positive")
+                              newadjvertex = "{#{tokenstring} => {#{searchterm} => [#{pos},1]}}"
+                              tweetbase.write(" => positive")
+                              @graph << newadjvertex
                            elsif  negativewords.include? tokenstring then
                               @negativecount = @negativecount + 1
-                              @graph << "negative"
-                              @sentiment_array.push("negative")
+                              #@graph << "negative"
+                              #@sentiment_array.push("negative")
+                              tweetbase.write(" => negative")
+                              newadjvertex = "{#{tokenstring} => {#{searchterm} => [#{pos},-1]}}"
+                              @graph << newadjvertex
                            else
                                 #puts "netural"
-                                @graph << "negative"
+                                #@graph << "negative"
                                 @negativecount += 1
-                                @sentiment_array.push("negative")
+                                #@sentiment_array.push("negative")
+                                tweetbase.write(" => negative")
+                                newadjvertex = "{#{tokenstring} => {#{searchterm} => [#{pos},-1]}}"
+                                @graph << newadjvertex
                            end 
                            #adding the adjective node
                               @graph.each do |vertex|
@@ -168,8 +171,14 @@ class HomeController < ApplicationController
            end
          #puts @sentiment_array
          #puts @graph
+         tweetbase.write("\n")
+         tweetgraph.write(@graph)
+         tweetgraph.write("\n")
+         
          #puts "##################"
        end
+   tweetbase.close()
+   tweetgraph.close()    
    puts @positivecount
    puts @negativecount
    @@positive_global = @positivecount

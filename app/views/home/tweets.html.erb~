@@ -1,0 +1,6 @@
+<%= @tweets_print.each do |tweet| %>
+<div class="alert alert-info">
+<%= tweet.text %>
+</br>
+</div>
+<% end %>

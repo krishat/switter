@@ -25,10 +25,9 @@
 	    		  <div class="span4"></div>
 		        	  </br></br>
 			          <h1>Sentiment Analysis On Twitter Tweets (SAOTT)</h1>
-			          </br></br>
+			          </br>
 			          <div>
-						<input id="user_searchterm" type="text" placeholder="enter a product or a place or a thing" text="hi">&nbsp;&nbsp;   
-						<button class="btn btn-primary" type="button" id="btnchart">Start Analysis</button>
+						<div class="well" style="color: grey"><h2>Results For The SearchTerm " <%= @searchterm %> " </h2></div>
 						</br>
 					  </div>
 		         </div>
@@ -38,11 +37,10 @@
     <div class="navbar">
   		<div class="navbar-inner">
      		<ul class="nav">
-     			<li class="active"><a href="#">HOMEPAGE</a></li>
-      			<li><a href="#">TWEETS</a></li>
-      			<li><a href="home/charts/chart" target="_parent">CHARTS</a></li>
-      			<li><a href="#">DATAFILE</a></li>
-    		</ul>
+     			<li><a href="homepage.html" target="_parent">HOMEPAGE</a></li>
+      			<li><a href="tweetbase.html" target="_parent">TWEETS</a></li>
+      			<li class="active"><a href="charts.html" target="_parent">CHARTS</a></li>
+      		</ul>
   		</div>
 	</div>
 	<div class="well well-large" id="welcomenote">

@@ -7,7 +7,9 @@ Switter::Application.routes.draw do
   # You can have the root of your site routed with "root"
   root 'home#index'
   get 'home/:user_searchterm' => 'home#result_tweet'
-  get 'home/charts/chart' => 'home#chart'
+  get 'charts.html' => 'home#chart'
+  get 'homepage.html' => 'home#index'
+  get 'tweetbase.html' => 'home#tweets'
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
 

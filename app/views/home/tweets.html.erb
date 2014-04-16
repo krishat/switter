@@ -1,0 +1,38 @@
+</br>
+	<div class="container" style="color: white">
+         	<div class="span20">
+     			<div class="row-fluid">
+	    		  <div class="span4"></div>
+		        	  </br></br>
+			          <h1>Sentiment Analysis On Twitter Tweets (SAOTT)</h1>
+			          </br>
+			          <div>
+						<div class="well" style="color: grey"><h2>Results For The SearchTerm " <%= @searchterm %> " </h2></div>
+						</br>
+					  </div>
+		         </div>
+		    </div>
+        </div>
+        </br>
+    <div class="navbar">
+  		<div class="navbar-inner">
+     		<ul class="nav">
+     			<li><a href="homepage.html" target="_parent">HOMEPAGE</a></li>
+      			<li class="active"><a href="tweetbase.html" target="_parent">TWEET BASE</a></li>
+      			<li><a href="charts.html" target="_parent">CHARTS</a></li>
+      		</ul>
+  		</div>
+	</div>
+	<div class="well well-large" id="welcomenote">
+		<h2>Contains History Of Tweets With Sentiment</h2>
+	  <%= @tweets_print.each do |tweet| %>
+		<div class="alert alert-danger">
+		<%= tweet %>
+		</br>
+		</div>
+		<% end %>  
+	</div>
+
+
+
+
