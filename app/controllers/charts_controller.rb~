@@ -1,5 +1,5 @@
 class ChartsController < ApplicationController
   def featured_chart
-    puts @@search_term
+    puts @@searchterm
   end
 end
