@@ -10,6 +10,9 @@ class HomeController < ApplicationController
   
   def index
       
+      @@positive_global = nil
+       @@negative_global = nil
+       @@search_term = nil
       #function to render the index page
    
   end
@@ -17,7 +20,16 @@ class HomeController < ApplicationController
   def chart
     @positivescore = @@positive_global
     @negativescore = @@negative_global
-    @searchterm = @@search_term 
+    @searchterm = @@search_term
+    if @positivescore.nil? then
+      @positivescore = 0
+    end 
+    if @negativescore.nil? then
+      @negativescore = 0
+    end
+    if @searchterm.nil? then
+      @searchterm = "none"
+    end
   end
   
   def tweets
@@ -30,6 +42,16 @@ class HomeController < ApplicationController
     end
   end
   
+  def sources
+    @source_print = Array.new
+    File.open("app/assets/images/tweetplace.txt", "r") do |f|
+         f.each_line do |line|
+            puts line
+            @source_print << line
+         end
+    end
+  end
+  
   def result_tweet
 
        #data read from positive and negative words file
@@ -37,6 +59,8 @@ class HomeController < ApplicationController
        negativewords = File.read("app/assets/images/negwrds.txt")
        tweetbase = File.open("app/assets/images/tweetbase.txt", 'a+')
        tweetgraph = File.open("app/assets/images/tweetgraph.txt", 'a+')
+       tweetplace = File.open("app/assets/images/tweetplace.txt", 'w')
+       
        #stanford nlp pipeline
        pipeline =  StanfordCoreNLP.load(:tokenize, :ssplit, :pos, :lemma, :parse, :ner, :dcoref)   
        @positivecount = 0
@@ -61,13 +85,14 @@ class HomeController < ApplicationController
        puts "*************************************"
        
        #twitter stream ,:result_type => "recent"
-       @tweetinput = client.search(searchterm,:lang => "en",:result_type => "mixed").take(2)
-             
+       @tweetinput = client.search(searchterm,{:lang => "en",:result_type => "recent"}).take(5)
+       #puts @tweetinput.methods   
        #Algorithm for performing sentimental analysis on tweets
        @tweetinput.each do |eachtweet|
        
        tweetbase.write(eachtweet.full_text)
-       
+       tweetplace.write(eachtweet.source)
+       tweetplace.write("\n")
        #removing all http RT and user name from the original tweet --> modified tweet
        originaltweet = eachtweet.full_text
        split_originaltweet = originaltweet.split()
@@ -178,7 +203,8 @@ class HomeController < ApplicationController
          #puts "##################"
        end
    tweetbase.close()
-   tweetgraph.close()    
+   tweetgraph.close()
+   tweetplace.close()    
    puts @positivecount
    puts @negativecount
    @@positive_global = @positivecount

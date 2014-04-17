@@ -10,6 +10,7 @@ Switter::Application.routes.draw do
   get 'charts.html' => 'home#chart'
   get 'homepage.html' => 'home#index'
   get 'tweetbase.html' => 'home#tweets'
+  get  'sources.html' => 'home#sources'
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
 

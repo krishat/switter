@@ -1,5 +1,6 @@
 </br>
-	<div class="container" style="color: white">
+	
+        <div class="container" style="color: white">
          	<div class="span20">
      			<div class="row-fluid">
 	    		  <div class="span4"></div>
@@ -18,22 +19,22 @@
   		<div class="navbar-inner">
      		<ul class="nav">
      			<li><a href="homepage.html" target="_parent">HOMEPAGE</a></li>
-      			<li class="active"><a href="tweetbase.html" target="_parent">TWEET BASE</a></li>
-      			<li><a href="charts.html" target="_parent">CHARTS</a></li>
-      			<li><a href="sources.html" target="_parent">SOURCES</a></li>
+      			<li><a href="tweetbase.html" target="_parent">TWEETS</a></li>
+      			<li ><a href="charts.html" target="_parent">CHARTS</a></li>
+      			<li class="active"><a href="sources.html" target="_parent">SOURCES</a></li>
       		</ul>
   		</div>
 	</div>
 	<div class="well well-large" id="welcomenote">
-		<h2>Contains History Of Tweets With Sentiment</h2>
-	  <%= @tweets_print.each do |tweet| %>
-		<div class="alert alert-danger">
-		<%= tweet %>
+	    <h2>Sources Of Tweets</h2>
+	  <%= @source_print.each do |tweet| %>
+		<div class="alert alert-warning">
+		<%= tweet.html_safe %>
 		</br>
 		</div>
 		<% end %>  
+
 	</div>
 
-
-
-
+      
+  
