@@ -28,7 +28,8 @@ class HomeController < ApplicationController
         $negativewords = File.read("app/assets/images/negwrds.txt")
         $tweetbase = File.open("app/assets/images/tweetbase.txt", 'a+')
         $tweetgraph = File.open("app/assets/images/tweetgraph.txt", 'w')
-        $tweetplace = File.open("app/assets/images/tweetplace.txt", 'w') 
+        $tweetplace = File.open("app/assets/images/tweetplace.txt", 'w')
+        $allgraphs = File.open("app/assets/images/allgraph.txt", 'a+') 
   end
   
   def chart
@@ -215,6 +216,12 @@ class HomeController < ApplicationController
    $tweetplace.close()    
    puts @positivecount
    puts @negativecount
+   File.open("app/assets/images/tweetgraph.txt", "r") do |f|
+         f.each_line do |line|
+            $allgraphs.write(line)
+         end
+    end
+   $allgraphs.close();
    $positive_global = @positivecount
    $negative_global = @negativecount    
    @@tweet_base = @text
