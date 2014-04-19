@@ -27,7 +27,7 @@ class HomeController < ApplicationController
         $positivewords = File.read("app/assets/images/poswrds.txt")
         $negativewords = File.read("app/assets/images/negwrds.txt")
         $tweetbase = File.open("app/assets/images/tweetbase.txt", 'a+')
-        $tweetgraph = File.open("app/assets/images/tweetgraph.txt", 'a+')
+        $tweetgraph = File.open("app/assets/images/tweetgraph.txt", 'w')
         $tweetplace = File.open("app/assets/images/tweetplace.txt", 'w') 
   end
   
@@ -80,7 +80,7 @@ class HomeController < ApplicationController
        puts "*************************************"
        
        #twitter stream ,:result_type => "recent"
-       @tweetinput = $client.search(searchterm,{:lang => "en",:result_type => "recent"}).take(5)
+       @tweetinput = $client.search(searchterm,{:lang => "en",:result_type => "recent"}).take(15)
        #puts @tweetinput.methods   
        #Algorithm for performing sentimental analysis on tweets
        @tweetinput.each do |eachtweet|
@@ -138,7 +138,9 @@ class HomeController < ApplicationController
                @sentiment_array = Array.new()
                # Syntatical dependencies
                #puts sentence.get(:basic_dependencies).to_s
-               counter = 0
+               @poscounter = 0
+               @negcounter = 0
+               $adjective = "#{searchterm}"
                sentence.get(:tokens).each do |token|
                       
                       tokenstring = token.get(:value).to_s
@@ -150,9 +152,10 @@ class HomeController < ApplicationController
                          #puts "working"
                          if (pos == "JJ"||pos == "JJR"||pos == "JJS") then
                            #check whether positive or not
-                                                                     
+                           $adjective = tokenstring                                          
                            if $positivewords.include? tokenstring then
                               @positivecount += 1
+                              @poscounter += 1
                               #@graph << "positive"
                               #@sentiment_array.push("positive")
                               newadjvertex = "{#{tokenstring} => {#{searchterm} => [#{pos},1]}}"
@@ -160,6 +163,7 @@ class HomeController < ApplicationController
                               @graph << newadjvertex
                            elsif  $negativewords.include? tokenstring then
                               @negativecount = @negativecount + 1
+                              @negcounter += 1
                               #@graph << "negative"
                               #@sentiment_array.push("negative")
                               $tweetbase.write(" => negative")
@@ -169,20 +173,28 @@ class HomeController < ApplicationController
                                 #puts "netural"
                                 #@graph << "negative"
                                 @negativecount += 1
+                                @negcounter += 1
                                 #@sentiment_array.push("negative")
                                 $tweetbase.write(" => negative")
                                 newadjvertex = "{#{tokenstring} => {#{searchterm} => [#{pos},-1]}}"
                                 @graph << newadjvertex
                            end 
                            #adding the adjective node
-                              @graph.each do |vertex|
-                                    vertex.sub(":adjective",tokenstring)
-                              end #graph end           
+                           #   @graph.each do |vertex|
+                            #        vertex.sub(":adjective",tokenstring)
+                             # end #graph end           
                          
                          else
-                           newvertex = "{#{tokenstring} => {:adjective => [#{pos},0]}}"
+                           if (pos == "VB"||pos == "VBD"||pos == "VBG"||pos == "VBV"||pos == "VBP"||pos == "VBZ") then
+                              newvertex = "{#{tokenstring} => {#{searchterm} => [#{pos},1]}}"
+                              @graph << newvertex
+			                        $adjective = tokenstring
+
+                           else
+                           newvertex = "{#{tokenstring} => {#{$adjective} => [#{pos},0]}}"
                            @graph << newvertex
-                           #puts newvertex 
+                           #puts newvertex
+                           end 
                          end#to check whether adjective or not
                       end #if not root
                       
@@ -192,6 +204,7 @@ class HomeController < ApplicationController
          #puts @sentiment_array
          #puts @graph
          $tweetbase.write("\n")
+         @graph[0] = "{#{searchterm} => {[#{@poscounter},#{@negcounter}]}}"
          $tweetgraph.write(@graph)
          $tweetgraph.write("\n")
          
@@ -235,7 +248,7 @@ class HomeController < ApplicationController
        puts "*************************************"
        
        #twitter stream ,:result_type => "recent"
-       @tweetinput = $client.search(searchterm,{:lang => "en",:result_type => "recent"}).take(5)
+       @tweetinput = $client.search(searchterm,{:lang => "en",:result_type => "recent"}).take(15)
        #puts @tweetinput.methods   
        #Algorithm for performing sentimental analysis on tweets
        @tweetinput.each do |eachtweet|
@@ -294,6 +307,7 @@ class HomeController < ApplicationController
                # Syntatical dependencies
                #puts sentence.get(:basic_dependencies).to_s
                counter = 0
+               adjective = ":adjective"
                sentence.get(:tokens).each do |token|
                       
                       tokenstring = token.get(:value).to_s
@@ -303,9 +317,9 @@ class HomeController < ApplicationController
                       if !(searchterm.include?(tokenstring)) 
                          
                          #puts "working"
+                         $adj = tokenstring
                          if (pos == "JJ"||pos == "JJR"||pos == "JJS") then
                            #check whether positive or not
-                                                                     
                            if $pwords.include? tokenstring then
                               @positivecount += 1
                               #@graph << "positive"
@@ -330,12 +344,10 @@ class HomeController < ApplicationController
                                 @graph << newadjvertex
                            end 
                            #adding the adjective node
-                              @graph.each do |vertex|
-                                    vertex.sub(":adjective",tokenstring)
-                              end #graph end           
+                                         
                          
                          else
-                           newvertex = "{#{tokenstring} => {:adjective => [#{pos},0]}}"
+                           newvertex = "{#{tokenstring} => { #{adjective} => [#{pos},0]}}"
                            @graph << newvertex
                            #puts newvertex 
                          end#to check whether adjective or not
@@ -345,12 +357,12 @@ class HomeController < ApplicationController
               
            end
          #puts @sentiment_array
-         #puts @graph
+         puts @graph
          $tbase.write("\n")
          $tgraph.write(@graph)
          $tgraph.write("\n")
          
-         #puts "##################"
+         puts "##################"
        end
    $tbase.close()
    $tgraph.close()
@@ -360,6 +372,19 @@ class HomeController < ApplicationController
    @title = params[:feature]
    render layout: false    
   
+  end
+
+  def process_graph
+     
+    puts "process graph"     
+    File.open("app/assets/images/tweetgraph.txt", "r") do |f|
+         f.each_line do |line|
+            #puts line
+            len = line.length-3
+            newline = line[1..len]
+            
+         end
+    end
   end
 
 end

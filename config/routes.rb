@@ -13,6 +13,7 @@ Switter::Application.routes.draw do
   get  'sources.html' => 'home#sources'
   get  'othercharts.html/:feature' => 'home#featured_chart'
   get  'othercharts.html' => 'home#othercharts'
+  get  'process.html' => 'home#process_graph'
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'
 
