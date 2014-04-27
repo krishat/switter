@@ -28,7 +28,8 @@ class HomeController < ApplicationController
         $negativewords = File.read("app/assets/images/negwrds.txt")
         $tweetbase = File.open("app/assets/images/tweetbase.txt", 'a+')
         $tweetgraph = File.open("app/assets/images/tweetgraph.txt", 'w')
-        $tweetplace = File.open("app/assets/images/tweetplace.txt", 'w') 
+        $tweetplace = File.open("app/assets/images/tweetplace.txt", 'w')
+        $allgraphs = File.open("app/assets/images/allgraph.txt", 'a+') 
   end
   
   def chart
@@ -138,8 +139,9 @@ class HomeController < ApplicationController
                @sentiment_array = Array.new()
                # Syntatical dependencies
                #puts sentence.get(:basic_dependencies).to_s
-               counter = 0
-               $adjective = ":adjective"
+               @poscounter = 0
+               @negcounter = 0
+               $adjective = "#{searchterm}"
                sentence.get(:tokens).each do |token|
                       
                       tokenstring = token.get(:value).to_s
@@ -154,6 +156,7 @@ class HomeController < ApplicationController
                            $adjective = tokenstring                                          
                            if $positivewords.include? tokenstring then
                               @positivecount += 1
+                              @poscounter += 1
                               #@graph << "positive"
                               #@sentiment_array.push("positive")
                               newadjvertex = "{#{tokenstring} => {#{searchterm} => [#{pos},1]}}"
@@ -161,6 +164,7 @@ class HomeController < ApplicationController
                               @graph << newadjvertex
                            elsif  $negativewords.include? tokenstring then
                               @negativecount = @negativecount + 1
+                              @negcounter += 1
                               #@graph << "negative"
                               #@sentiment_array.push("negative")
                               $tweetbase.write(" => negative")
@@ -170,6 +174,7 @@ class HomeController < ApplicationController
                                 #puts "netural"
                                 #@graph << "negative"
                                 @negativecount += 1
+                                @negcounter += 1
                                 #@sentiment_array.push("negative")
                                 $tweetbase.write(" => negative")
                                 newadjvertex = "{#{tokenstring} => {#{searchterm} => [#{pos},-1]}}"
@@ -184,7 +189,7 @@ class HomeController < ApplicationController
                            if (pos == "VB"||pos == "VBD"||pos == "VBG"||pos == "VBV"||pos == "VBP"||pos == "VBZ") then
                               newvertex = "{#{tokenstring} => {#{searchterm} => [#{pos},1]}}"
                               @graph << newvertex
-			      $adjective = tokenstring
+			                        $adjective = tokenstring
 
                            else
                            newvertex = "{#{tokenstring} => {#{$adjective} => [#{pos},0]}}"
@@ -199,10 +204,8 @@ class HomeController < ApplicationController
            end
          #puts @sentiment_array
          #puts @graph
-         @graph.each do |vertex|
-           vertex.sub(":adjective",$adjective)
-         end #graph end
          $tweetbase.write("\n")
+         @graph[0] = "{#{searchterm} => {[#{@poscounter},#{@negcounter}]}}"
          $tweetgraph.write(@graph)
          $tweetgraph.write("\n")
          
@@ -213,6 +216,12 @@ class HomeController < ApplicationController
    $tweetplace.close()    
    puts @positivecount
    puts @negativecount
+   File.open("app/assets/images/tweetgraph.txt", "r") do |f|
+         f.each_line do |line|
+            $allgraphs.write(line)
+         end
+    end
+   $allgraphs.close();
    $positive_global = @positivecount
    $negative_global = @negativecount    
    @@tweet_base = @text
@@ -374,14 +383,13 @@ class HomeController < ApplicationController
 
   def process_graph
      
-         
+    puts "process graph"     
     File.open("app/assets/images/tweetgraph.txt", "r") do |f|
          f.each_line do |line|
             #puts line
-            line_array = line.split
-            line_array.each do |hasher|
-              puts hasher
-            end
+            len = line.length-3
+            newline = line[1..len]
+            
          end
     end
   end

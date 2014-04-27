@@ -81,7 +81,7 @@ class HomeController < ApplicationController
        puts "*************************************"
        
        #twitter stream ,:result_type => "recent"
-       @tweetinput = $client.search(searchterm,{:lang => "en",:result_type => "recent"}).take(15)
+       @tweetinput = $client.search(searchterm,{:lang => "en",:result_type => "recent"}).take(100)
        #puts @tweetinput.methods   
        #Algorithm for performing sentimental analysis on tweets
        @tweetinput.each do |eachtweet|
