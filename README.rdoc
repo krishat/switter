@@ -5,13 +5,13 @@ application up and running.
 
 Things you may want to cover:
 
-* Ruby version
+* Ruby version - Ruby 1.9.3, Ruby on Rails version 4
 
 * System dependencies
 
 * Configuration
 
-* Database creation
+* Database creation - MongoDB , File System creation
 
 * Database initialization
 
@@ -21,17 +21,11 @@ Things you may want to cover:
 
 * Deployment instructions
 
-* ...
+*PROJECT DESCRIPTION 
 
 
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
-********************************************************************************
-**PROJECT DESCRIPTION 
-********************************************************************************
+OVERVIEW
 
->OVERVIEW
- --------
 In the modern world Social networks and micro blogging have been the medium of expressing love and hate towards things
 in the world. Most of the messages found on the social network give us a platform to extract knowledge.
 Many companies use surveys and feedbacks as inputs in designing and producing their products. 
